@@ -1,0 +1,94 @@
+This is the easy Leetcode problem of contest 120. In this problem, you are given a sorted array, and should return a sorted array of the squares of the values in the array.
+
+
+Problem statement
+The only thing that needs to be done there, apart from squaring the values, is to resort the array, because squaring negative values can reverse the order (for instance [-1, 0, 2] squared will be [1, 0, 4], and then resorted it will be [0, 1, 4]).
+
+This can be done with the straightforward solution that follows:
+
+class Solution {
+    public int[] sortedSquares(int[] A) {
+        int N = A.length;
+        for (int i = 0; i < N; i++) {
+            A[i] = A[i] * A[i];
+        }
+        Arrays.sort(A);
+        return A;
+    }
+}
+Then I wanted to do a little bit more work to obtain a linear time solution. The way it is done is by splitting the array in the middle when the sign of the values change from negative to positive (note that we could have done a simple binary search in O(ln N), but since the algorithm was going to be in linear time I didn’t do that).
+
+Once we found the index p where the value become positive, we do the merge step from the merge-sort algorithms with subarray A[0,p] and A[p, N](second index excluded), but going through A[0,p] in reverse order.
+
+Also I special cased the case where all the numbers were positive and the case where all the numbers were negative. This wasn’t necessary but simplified the steps in these border cases.
+
+class Solution {
+    public int[] sortedSquares(int[] A) {
+        int N = A.length;
+        boolean first = (A[0] <= 0);
+        boolean last = (A[N-1] <= 0);
+        if (first != last) {
+            int x = firstPositive(A);
+            int y = x - 1;
+            int[] B = new int[N];
+            for (int i = 0; i < N; i++) {
+                if (y < 0) {
+                    B[i] = A[x] * A[x];
+                    x++;
+                } else if (x >= N) {
+                    B[i] = A[y] * A[y];
+                    y--;
+                } else {
+                    int vX = A[x] * A[x];
+                    int vY = A[y] * A[y];
+                    if (vX < vY) {
+                        B[i] = vX;
+                        x++;
+                    } else {
+                        B[i] = vY;
+                        y--;
+                    }
+                }
+            }
+            return B;
+        } else {
+            if (first) {
+                // everything in reverse order
+                reverse(A);
+                square(A);
+            } else {
+                // everything is in order
+                square(A);
+            }
+        }
+        return A;
+    }
+    
+    int firstPositive(int[] A) {
+        int N = A.length;
+        for (int i = 0; i < N; i++) {
+            if (A[i] >= 0) {
+                return i;
+            }
+        }
+        throw new RuntimeException("No positive number");
+    }
+    void square(int[] A) {
+        int N = A.length;
+        for (int i = 0; i < N; i++) {
+            A[i] *= A[i];
+        }    
+    }
+    void reverse(int[] A) {
+        int N = A.length;
+        for (int i = 0; i < N/2; i++) {
+            swap(A, i, N-1-i);
+        }
+    }
+    void swap(int[] A, int x, int y) {
+        int r = A[x];
+        A[x] = A[y];
+        A[y] = r;
+    }
+}
+Happy coding!

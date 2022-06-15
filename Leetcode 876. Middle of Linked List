@@ -1,0 +1,40 @@
+Given a non-empty, singly linked list with head node head, return a middle node of linked list.
+
+If there are two middle nodes, return the second middle node.
+
+Note: The number of nodes in the given list will be between 1 and 100.
+
+Analysis
+The problem is very simple. A straightforward way is to iterate and find the length first, and then start over to return the node which in the middle:
+
+public ListNode middleNode(ListNode head) {
+    // get the length of the linked list
+    int len = 0;
+    ListNode current = head;
+    while (current != null) {
+        len++;
+        current = current.next;
+    }
+    current = head;
+    int mid = len / 2;
+    for (int i = 0; i < mid; i++) {
+        current = current.next;
+    }
+    return current;
+}
+However, there’s a “smarter” approach which requires only one iteration:
+
+class Solution {
+    public ListNode middleNode(ListNode head) {
+        ListNode slow = head;
+        ListNode fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+}
+
+Summary
+This is an interesting problem in a sense that it can be solved only with one iteration. Similar problems can be like “return the 1/3/1/4/1/5/… element in the linked list” etc etc, and we can deal with them using exactly the same tactics.
